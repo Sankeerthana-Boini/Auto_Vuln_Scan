@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vulnerability Report</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    /* Add in-page styles or move to style.css later */
+    #searchInput {
+        width: 300px;
+        padding: 10px;
+        margin: 20px 0;
+        font-size: 16px;
+    }
+    th {
+        cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Vulnerability Report</h1>
+
+  <input type="text" id="searchInput" placeholder="Search vulnerabilities...">
+
+  <table id="vulnTable">
+    <thead>
+      <tr>
+        <th onclick="sortTable(0)">Name</th>
+        <th onclick="sortTable(1)">Risk</th>
+        <th onclick="sortTable(2)">Description</th>
+        <th onclick="sortTable(3)">Solution</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for alert in alerts %}
+      <tr>
+        <td>{{ alert.name }}</td>
+        <td>{{ alert.risk }}</td>
+        <td>{{ alert.desc }}</td>
+        <td>{{ alert.solution }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <script>
+    // SEARCH FUNCTION
+    document.getElementById("searchInput").addEventListener("keyup", function() {
+      const filter = this.value.toLowerCase();
+      const rows = document.querySelectorAll("#vulnTable tbody tr");
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+      });
+    });
+
+    // SORT FUNCTION
+    function sortTable(columnIndex) {
+      const table = document.getElementById("vulnTable");
+      const rows = Array.from(table.rows).slice(1);
+      let ascending = table.getAttribute("data-sort-dir") !== "asc";
+      table.setAttribute("data-sort-dir", ascending ? "asc" : "desc");
+
+      rows.sort((a, b) => {
+        let x = a.cells[columnIndex].innerText.toLowerCase();
+        let y = b.cells[columnIndex].innerText.toLowerCase();
+        return ascending ? x.localeCompare(y) : y.localeCompare(x);
+      });
+
+      const tbody = table.querySelector("tbody");
+      tbody.innerHTML = "";
+      rows.forEach(row => tbody.appendChild(row));
+    }
+  </script>
+</body>
+</html>
